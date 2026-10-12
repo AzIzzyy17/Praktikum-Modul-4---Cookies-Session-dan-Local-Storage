@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/login', [AuthController::class, 'showLogin']);
@@ -20,3 +21,7 @@ Route::get('/riwayat-pesanan', [OrderController::class, 'riwayat']);
 
 Route::get('/register', [AuthController::class, 'showRegister']);
 Route::post('/register', [AuthController::class, 'processRegister']);
+
+Route::get('/', [CartController::class, 'index']);
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
