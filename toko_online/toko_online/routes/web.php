@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\RoleController;
 
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/login', [AuthController::class, 'showLogin']);
@@ -25,3 +26,7 @@ Route::post('/register', [AuthController::class, 'processRegister']);
 Route::get('/', [CartController::class, 'index']);
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+
+Route::patch('/admin/users/{user}/role', [RoleController::class, 'update'])
+    ->middleware(['auth', 'can:manage-roles'])
+    ->name('admin.users.role.update');
