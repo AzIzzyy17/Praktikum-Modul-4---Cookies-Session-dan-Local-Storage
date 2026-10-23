@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -19,12 +21,14 @@ class AuthController extends Controller
         $username = $request->input('username');
         $password = $request->input('password');
 
-        $user = DB::table('users')->where('username', $username)->first();
+        $user = User::where('username', $username)->first();
 
         if ($user && Hash::check($password, $user->password)) {
-            // Simpan sesi login
-            Session::put('id_user', $user->id_user);
+            Session::put('id_user', $user->id_user ?? $user->id);
             Session::put('nama_lengkap', $user->nama_lengkap);
+            
+            Auth::login($user);
+
             return redirect('/')->with('success', 'Berhasil login!');
         }
 
@@ -34,6 +38,8 @@ class AuthController extends Controller
     public function logout()
     {
         Session::flush();
+        Auth::logout(); 
+        
         return redirect('/login')->with('success', 'Berhasil logout!');
     }
 
@@ -52,7 +58,6 @@ class AuthController extends Controller
             'no_hp' => 'required|string|max:15',
             'alamat' => 'required|string',
         ]);
-
 
         $id_user = 'USR' . rand(100, 999);
 

@@ -17,11 +17,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $primaryKey = 'id_user'; 
+    public $incrementing = false;      
+    protected $keyType = 'string';
+
     protected function casts(): array
     {
         return [
@@ -29,4 +28,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $fillable = [
+        'nama_lengkap', 'email', 'username', 'password', 'role', 'no_hp', 'alamat', 'id_user'
+    ];
 }

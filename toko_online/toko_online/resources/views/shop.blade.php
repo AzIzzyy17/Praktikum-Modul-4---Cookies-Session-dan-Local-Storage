@@ -30,6 +30,7 @@
     <button onclick="clearCart()" style="background: #c62828;">Kosongkan Keranjang</button>
 
     <h3>Respons Laravel</h3>
+</form>
     <pre id="response">Belum ada request.</pre>
 </div>
 
@@ -108,4 +109,86 @@ function clearCart() {
 </script>
 
 </body>
+@php
+    // Ambil otomatis satu user yang punya role 'customer'
+    $targetCustomer = \App\Models\User::where('role', 'customer')->first();
+@endphp
+
+@if($targetCustomer)
+<div style="background: #f8d7da; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <strong>Uji Coba Skenario 1 (Admin -> Customer ke Staff):</strong>
+    <!-- Form action otomatis memakai id_user milik customer tersebut -->
+    <form action="{{ route('admin.users.role.update', $targetCustomer->id_user) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="role" value="staff">
+        <button type="submit" style="background: blue; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer;">
+            Ubah Role ({{ $targetCustomer->username }}) Jadi Staff
+        </button>
+    </form>
+</div>
+<!-- @endif
+
+@php
+    // Ambil target akun admin (bisa diri sendiri atau admin lain)
+    $targetAdmin = \App\Models\User::where('role', 'admin')->first();
+@endphp
+
+@php
+    // Ambil sembarang user untuk dijadikan target uji coba
+    $sembarangUser = \App\Models\User::first();
+@endphp
+
+@if($sembarangUser)
+<div style="background: #e2e3e5; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <strong>Uji Coba Skenario 3 (Customer Mencoba Ubah Role):</strong>
+    <form action="{{ route('admin.users.role.update', $sembarangUser->id_user) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="role" value="staff">
+        <button type="submit" style="background: #6c757d; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer;">
+            Ubah Role
+        </button>
+    </form>
+</div>
+@endif -->
+
+@php
+    $adminSelf = \Illuminate\Support\Facades\Auth::user();
+    $targetCustomer = \App\Models\User::where('role', 'customer')->first(); 
+@endphp
+
+@if($adminSelf && $adminSelf->role === 'admin' && $targetCustomer)
+<div style="background: #e2e3e5; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <strong>Uji Coba Skenario Admin (Worksheet):</strong>
+
+    <!-- 1. Admin: role diri sendiri -->
+    <form action="{{ route('admin.users.role.update', $adminSelf->id_user) }}" method="POST" style="margin-bottom: 10px;">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="role" value="staff">
+        <button type="submit" style="background: red; color: white; padding: 8px;">1. Ubah Role Diri Sendiri (Admin -> Staff)</button>
+    </form>
+
+    <!-- 2. Admin: input role admin -->
+    <form action="{{ route('admin.users.role.update', $targetCustomer->id_user) }}" method="POST" style="margin-bottom: 10px;">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="role" value="admin">
+        <button type="submit" style="background: blue; color: white; padding: 8px;">2. Jadikan Customer sebagai Admin</button>
+    </form>
+
+    <!-- 3. Admin: role sama -->
+    <form action="{{ route('admin.users.role.update', $targetCustomer->id_user) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="role" value="customer">
+        <button type="submit" style="background: orange; color: white; padding: 8px;">3. Ubah Customer menjadi Customer (Role Sama)</button>
+    </form>
+
+    @error('role')
+        <div style="color: red; margin-top: 10px;"><strong>BUKTI ERROR VALIDASI:</strong> {{ $message }}</div>
+    @enderror
+</div>
+@endif
 </html>
